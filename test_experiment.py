@@ -2,6 +2,10 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
+from unittest import mock
+
+import experiment
 
 import torch
 from transformers import Qwen3Config, Qwen3ForCausalLM
@@ -27,6 +31,7 @@ from experiment import (
     NAMES,
     LOCKERS,
     CODES,
+    normalize_device,
 )
 
 
@@ -57,6 +62,67 @@ def tiny_config():
         rope_theta=1000000.0,
         attention_dropout=0.0,
     )
+
+
+class DeviceTests(unittest.TestCase):
+    def test_bare_cuda_uses_current_index_and_preserves_explicit_devices(self):
+        with mock.patch("torch.cuda.current_device", return_value=3) as current:
+            self.assertEqual(normalize_device("cuda"), torch.device("cuda:3"))
+            current.assert_called_once_with()
+        with mock.patch(
+            "torch.cuda.current_device",
+            side_effect=AssertionError("unexpected CUDA lookup"),
+        ):
+            self.assertEqual(normalize_device("cuda:1"), torch.device("cuda:1"))
+            self.assertEqual(normalize_device("cpu"), torch.device("cpu"))
+
+    def test_cli_normalizes_before_set_device_and_run(self):
+        for requested, expected in (("cuda", "cuda:3"), ("cuda:1", "cuda:1")):
+            with self.subTest(
+                requested=requested
+            ), tempfile.TemporaryDirectory() as tmp:
+                argv = [
+                    "experiment.py",
+                    "--device",
+                    requested,
+                    "--out",
+                    str(Path(tmp) / "run"),
+                ]
+                with mock.patch("sys.argv", argv), mock.patch(
+                    "torch.cuda.is_available", return_value=True
+                ), mock.patch("torch.cuda.current_device", return_value=3), mock.patch(
+                    "torch.cuda.set_device"
+                ) as set_device, mock.patch(
+                    "torch.cuda.is_bf16_supported", return_value=True
+                ), mock.patch(
+                    "experiment.run"
+                ) as run:
+                    experiment.main()
+                set_device.assert_called_once_with(torch.device(expected))
+                self.assertEqual(run.call_args.args[2], torch.device(expected))
+
+    def test_engine_sync_and_runtime_metadata_use_indexed_cuda(self):
+        model = SimpleNamespace(
+            model=SimpleNamespace(rotary_emb=None),
+            generation_config=SimpleNamespace(eos_token_id=1),
+        )
+        props = SimpleNamespace(name="mock GPU", total_memory=96 * 1024**3)
+        with mock.patch("torch.cuda.current_device", return_value=2), mock.patch(
+            "torch.cuda.synchronize"
+        ) as synchronize, mock.patch(
+            "torch.cuda.get_device_properties", return_value=props
+        ) as properties, mock.patch(
+            "torch.cuda.get_device_capability", return_value=(9, 0)
+        ) as capability:
+            engine = Engine(model, TinyTokenizer(), "cuda")
+            engine.sync()
+            metadata = experiment.runtime("cuda")
+        indexed = torch.device("cuda:2")
+        self.assertEqual(engine.device, indexed)
+        synchronize.assert_called_once_with(indexed)
+        properties.assert_called_once_with(indexed)
+        capability.assert_called_once_with(indexed)
+        self.assertEqual(metadata["device"], "cuda:2")
 
 
 class CacheTests(unittest.TestCase):

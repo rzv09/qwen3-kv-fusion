@@ -18,6 +18,8 @@ python -m unittest -v
 
 Python 3.10+; locally tested with Python 3.11.13, PyTorch 2.7.1 and Transformers 4.57.1. Pinned dependencies are in `requirements.txt`. Tokenizers needs an ARM64 wheel or the site's compatible build. CUDA BF16/GH200 and the 14B checkpoint are **not locally hardware-tested**. The official model has 14.8B parameters: BF16 weights alone are roughly 30 GB, plus caches/activations and temporary loading memory. A 96 GB GH200 is the intended target, not a measured memory guarantee. Eager attention is the conservative default; `--attention sdpa` is optional and untested on this cluster.
 
+`--device cuda` resolves to the current visible logical CUDA index (normally `cuda:0`). Explicit indices such as `cuda:1` are preserved. This normalized device is also used for CUDA timing, memory and hardware queries.
+
 ## 2. Smoke run, then full run
 
 Run directly in your already allocated interactive environment. First model use downloads the public checkpoint into your normal Hugging Face cache; use the cluster's approved cache location if needed. No 14B weights are included in this repository.
@@ -103,7 +105,7 @@ python -m unittest -v
 python audit_results.py --run runs/14b-main
 ```
 
-Eleven unit tests cover actual Qwen rotary agreement, zero/inverse shifts, BF16 rotation arithmetic, prefix removal, unchanged values, fresh-cache non-aliasing, tiny randomly initialized Qwen3 generation/serialization, independent data generation, hidden-reasoning scoring, and torn-journal handling and exclusion of worked-example entities from evidence pools. `validation/` includes a privacy-filtered pretrained Qwen3-0.6B engineering snapshot and check logs; it is not a resumable run directory. They are engineering validation, not a new held-out research result. See `VALIDATION.md` for exact executed commands and limits.
+Fourteen unit tests cover actual Qwen rotary agreement, zero/inverse shifts, BF16 rotation arithmetic, prefix removal, unchanged values, fresh-cache non-aliasing, tiny randomly initialized Qwen3 generation/serialization, independent data generation, hidden-reasoning scoring, and torn-journal handling and exclusion of worked-example entities from evidence pools, and mocked bare/explicit CUDA index handling through CLI, engine and hardware queries. `validation/` includes a privacy-filtered pretrained Qwen3-0.6B engineering snapshot and check logs; it is not a resumable run directory. They are engineering validation, not a new held-out research result. See `VALIDATION.md` for exact executed commands and limits.
 
 If CUDA is unavailable, fix the site's PyTorch/CUDA environment; this repository does not choose a CUDA wheel. If out of memory, try the small smoke configuration first; reduce chains/token budget in a **new** run, or ask for analysis of memory metadata. Do not move a changed configuration into an existing run folder. If full-text or single-hop controls fail, merged-cache failure is inconclusive. If token caps dominate, increase the budget on smoke data before defining the held-out run. Quantized or custom/scaled-RoPE variants require separate validation and are intentionally unsupported here.
 

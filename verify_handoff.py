@@ -10,7 +10,7 @@ os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from experiment import Block, Engine, atomic_json
+from experiment import Block, Engine, atomic_json, normalize_device
 
 
 def main():
@@ -24,10 +24,11 @@ def main():
     manifest = json.loads((run / "manifest.json").read_text())
     handoff = json.loads((run / "handoff.json").read_text())
     config = manifest["config"]
-    device = torch.device(config["device"])
+    device = normalize_device(config["device"])
     torch.set_num_threads(config["threads"])
     torch.use_deterministic_algorithms(True)
     if device.type == "cuda":
+        torch.cuda.set_device(device)
         torch.backends.cuda.matmul.allow_tf32 = False
         torch.backends.cudnn.allow_tf32 = False
     local = args.local_model or config["local_model"]

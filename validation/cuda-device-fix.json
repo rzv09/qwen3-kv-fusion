@@ -1,0 +1,20 @@
+{
+  "fix": "Resolve unindexed CUDA devices once before CUDA API use; preserve explicit indices",
+  "unit_tests_passed": 14,
+  "mocked_cuda_regression": true,
+  "actual_cuda_or_cluster_execution": false,
+  "checked_cuda_apis": [
+    "set_device",
+    "synchronize",
+    "reset_peak_memory_stats",
+    "max_memory_allocated",
+    "max_memory_reserved",
+    "get_device_properties",
+    "get_device_capability"
+  ],
+  "result_schema_changed": false,
+  "existing_results_rewritten": false,
+  "failed_set_device_attempt_created_run_metadata": false,
+  "strict_resume_source_fingerprint_guard_unchanged": true,
+  "experiment_source_sha256": "35c97930259f2624c51968ed94fa3bc0dbb251080861ebf5b086f7df8caf2bb8"
+}

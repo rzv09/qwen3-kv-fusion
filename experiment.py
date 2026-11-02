@@ -295,9 +295,21 @@ def query_text(entry, condition, thinking):
     )
 
 
+def normalize_device(device):
+    """Resolve bare CUDA to the current logical index; preserve explicit indices."""
+    resolved = torch.device(device)
+    if resolved.type == "cuda" and resolved.index is None:
+        return torch.device("cuda", torch.cuda.current_device())
+    return resolved
+
+
 class Engine:
     def __init__(self, model, tokenizer, device):
-        self.model, self.tokenizer, self.device = model, tokenizer, torch.device(device)
+        self.model, self.tokenizer, self.device = (
+            model,
+            tokenizer,
+            normalize_device(device),
+        )
         self.rotary = model.model.rotary_emb
         eos = model.generation_config.eos_token_id
         self.eos = set(eos if isinstance(eos, list) else [eos])
@@ -472,6 +484,7 @@ def resolve_identity(args):
 
 
 def runtime(device):
+    device = normalize_device(device)
     result = dict(
         python=platform.python_version(),
         platform=platform.platform(),
@@ -665,6 +678,7 @@ def main():
             "CUDA unavailable. Use the cluster CUDA-enabled PyTorch environment; requirements do not install torch."
         )
     if device.type == "cuda":
+        device = normalize_device(device)
         torch.cuda.set_device(device)
     if (
         device.type == "cuda"

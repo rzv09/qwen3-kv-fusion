@@ -1,0 +1,20 @@
+test_bfloat16_rebase_uses_float32_trig (test_experiment.CacheTests.test_bfloat16_rebase_uses_float32_trig) ... ok
+test_fresh_dynamic_cache_does_not_alias_pristine (test_experiment.CacheTests.test_fresh_dynamic_cache_does_not_alias_pristine) ... ok
+test_matches_actual_qwen_rotary_at_shifted_positions (test_experiment.CacheTests.test_matches_actual_qwen_rotary_at_shifted_positions) ... ok
+test_prefix_removed_once_and_values_preserved (test_experiment.CacheTests.test_prefix_removed_once_and_values_preserved) ... ok
+test_real_tiny_model_generation_and_reload_are_immutable (test_experiment.CacheTests.test_real_tiny_model_generation_and_reload_are_immutable) ... ok
+test_zero_and_inverse_rebase (test_experiment.CacheTests.test_zero_and_inverse_rebase) ... ok
+test_bare_cuda_uses_current_index_and_preserves_explicit_devices (test_experiment.DeviceTests.test_bare_cuda_uses_current_index_and_preserves_explicit_devices) ... ok
+test_cli_normalizes_before_set_device_and_run (test_experiment.DeviceTests.test_cli_normalizes_before_set_device_and_run) ... ok
+test_engine_sync_and_runtime_metadata_use_indexed_cuda (test_experiment.DeviceTests.test_engine_sync_and_runtime_metadata_use_indexed_cuda) ... ok
+test_dataset_target_independence_and_derangement (test_experiment.ProtocolTests.test_dataset_target_independence_and_derangement) ... ok
+test_jsonl_middle_corruption_is_not_skipped (test_experiment.ProtocolTests.test_jsonl_middle_corruption_is_not_skipped) ... ok
+test_jsonl_torn_tail_repair_preserves_evidence (test_experiment.ProtocolTests.test_jsonl_torn_tail_repair_preserves_evidence) ... Restored complete JSONL prefix; preserved torn tail: <temporary-path>
+ok
+test_never_grade_hidden_reasoning (test_experiment.ProtocolTests.test_never_grade_hidden_reasoning) ... ok
+test_worked_example_entities_do_not_overlap_evidence_pools (test_experiment.ProtocolTests.test_worked_example_entities_do_not_overlap_evidence_pools) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.098s
+
+OK
