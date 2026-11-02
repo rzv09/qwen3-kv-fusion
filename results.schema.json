@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Independent Qwen3 KV experiment portable checkpoint",
+  "type": "object",
+  "required": ["schema_version", "status", "manifest", "corpora", "results", "summary"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "status": {"enum": ["complete", "incomplete"]},
+    "manifest": {
+      "type": "object",
+      "required": ["schema_version", "protocol", "fingerprint", "config", "model", "runtime", "source_sha256", "shared_prefix_text"],
+      "properties": {
+        "fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "config": {"type": "object", "required": ["model", "device", "dtype", "seeds", "chains", "queries", "max_new_tokens", "thinking", "conditions"]},
+        "model": {"type": "object", "required": ["model_id", "tokenizer_id", "model_resolved_revision", "tokenizer_resolved_revision"]},
+        "runtime": {"type": "object", "required": ["python", "torch", "transformers", "cuda_runtime", "device", "packages"]}
+      }
+    },
+    "corpora": {"type": "array", "items": {"type": "object", "required": ["corpus_id", "seed", "entries", "source_a", "source_b", "wrong_b", "query_entry_indices", "cache_lengths", "targets_sampled_after_cache_creation"]}},
+    "results": {"type": "array", "items": {"$ref": "#/$defs/record"}},
+    "summary": {"type": "object", "required": ["status", "expected_records", "observed_records", "conditions"]}
+  },
+  "$defs": {
+    "record": {
+      "type": "object",
+      "required": ["schema_version", "run_fingerprint", "record_id", "corpus_id", "corpus_seed", "query_id", "condition", "thinking", "expected_answer", "generated_text", "generated_text_with_special_tokens", "generated_token_ids", "generated_token_count", "parsed_answer", "strict_correct", "normalized_correct", "final_available", "stop_reason", "completed", "truncated", "past_cache_tokens", "query_tokens", "timing", "memory"],
+      "properties": {
+        "schema_version": {"const": "1.0.0"},
+        "thinking": {"type": "boolean"},
+        "strict_correct": {"type": "boolean"},
+        "normalized_correct": {"type": "boolean"},
+        "completed": {"type": "boolean"},
+        "truncated": {"type": "boolean"},
+        "final_available": {"type": "boolean"},
+        "stop_reason": {"enum": ["eos", "token_cap"]},
+        "parsed_answer": {"type": ["string", "null"]},
+        "generated_token_ids": {"type": "array", "minItems": 1, "items": {"type": "integer"}},
+        "generated_token_count": {"type": "integer", "minimum": 1},
+        "timing": {"type": "object", "required": ["cache_clone_seconds", "query_tokenize_seconds", "question_forward_and_first_token_seconds", "generation_including_question_seconds", "receiver_total_seconds", "condition_cache_build_seconds"], "additionalProperties": {"type": "number", "minimum": 0}},
+        "memory": {"type": ["object", "null"]}
+      }
+    }
+  }
+}

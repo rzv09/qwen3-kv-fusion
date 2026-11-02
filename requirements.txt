@@ -1,0 +1,5 @@
+# Install/use site-provided CUDA-enabled PyTorch FIRST. Deliberately no torch wheel.
+transformers==4.57.1
+huggingface-hub==0.36.2
+tokenizers==0.22.2
+safetensors==0.5.3

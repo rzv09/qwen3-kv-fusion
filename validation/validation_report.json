@@ -1,0 +1,27 @@
+{
+  "status": "passed",
+  "unit_tests": 11,
+  "lint": "ruff passed",
+  "format": "black passed",
+  "syntax": "compileall passed",
+  "schema": "Draft 2020-12 / jsonschema 4.19.2",
+  "actual_model": "Qwen/Qwen3-0.6B",
+  "device": "cpu",
+  "dtype": "float32",
+  "smoke_records": 10,
+  "smoke_eos": 10,
+  "fresh_process_max_logit_error": 0.0,
+  "save_reload_max_logit_error": 0.0,
+  "resume_checks": {
+    "complete_resume_skipped_model_and_generation": true,
+    "changed_budget_rejected": true,
+    "journal_unchanged": true,
+    "partial_regenerated_only_one_missing_row": true,
+    "completed_records_unchanged": true,
+    "regenerated_token_ids_identical": true
+  },
+  "source_sha256": "e7fb81b403ef61e787ab82338e90735c4456329a4e035343e0ecfdf00131a913",
+  "smoke_results_sha256": "e1e7ce8d626aff6d51f0388ba48063d0a83fc724d1661d05d95c34b718511c46",
+  "qwen3_14b_tested": false,
+  "cuda_tested": false
+}

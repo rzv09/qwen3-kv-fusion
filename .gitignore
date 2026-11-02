@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+runs/
+validation/*/runtime-check-*.pt
+*.lock
+*.pt
+*.bin
+.ruff_cache/

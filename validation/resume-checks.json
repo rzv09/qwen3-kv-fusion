@@ -1,0 +1,8 @@
+{
+  "complete_resume_skipped_model_and_generation": true,
+  "changed_budget_rejected": true,
+  "journal_unchanged": true,
+  "partial_regenerated_only_one_missing_row": true,
+  "completed_records_unchanged": true,
+  "regenerated_token_ids_identical": true
+}
